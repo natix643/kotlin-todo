@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">TODO</string>
     <string name="list_empty">Nothing to do :)</string>
+
+    <string name="menu_filter">Filter</string>
+    <string name="menu_filter_all">All</string>
+    <string name="menu_filter_active">Active</string>
+    <string name="menu_filter_completed">Completed</string>
+    <string name="dialog_title">What needs to be done?</string>
 </resources>
