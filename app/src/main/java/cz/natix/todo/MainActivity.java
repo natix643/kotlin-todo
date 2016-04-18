@@ -3,23 +3,22 @@ package cz.natix.todo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity implements TextInputDialog.Callback {
-
-    private Database database = new Database();
 
     private TodoAdapter adapter;
 
@@ -44,10 +43,15 @@ public class MainActivity extends AppCompatActivity implements TextInputDialog.C
         });
 
         adapter = new TodoAdapter(this);
-        adapter.setItems(database.getTodos());
 
         listView.setAdapter(adapter);
         listView.setEmptyView(emptyListText);
+        registerForContextMenu(listView);
+    }
+
+    @Override
+    public void onTextInput(String text) {
+        adapter.add(new Todo(text));
     }
 
     @Override
@@ -57,32 +61,29 @@ public class MainActivity extends AppCompatActivity implements TextInputDialog.C
     }
 
     @Override
-    public void onTextInput(String text) {
-        Todo todo = new Todo(text);
-        adapter.add(todo);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_delete_completed) {
+            Collection<Todo> completedTodos = Collections2.filter(adapter.getItems(), isCompleted);
+            adapter.removeAll(completedTodos);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        item.setChecked(true);
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        getMenuInflater().inflate(R.menu.context, menu);
+    }
 
-        switch (item.getItemId()) {
-            case R.id.menu_filter_all:
-                adapter.setItems(database.getTodos());
-                return true;
-            case R.id.menu_filter_active: {
-                Collection<Todo> todos = Collections2.filter(
-                        database.getTodos(), Predicates.not(isCompleted));
-                adapter.setItems(new ArrayList<>(todos));
-                return true;
-            }
-            case R.id.menu_filter_completed: {
-                Collection<Todo> todos = Collections2.filter(database.getTodos(), isCompleted);
-                adapter.setItems(new ArrayList<>(todos));
-                return true;
-            }
-            default:
-                return false;
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_delete) {
+            AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+            adapter.remove(info.position);
+            return true;
+        } else {
+            return false;
         }
     }
 

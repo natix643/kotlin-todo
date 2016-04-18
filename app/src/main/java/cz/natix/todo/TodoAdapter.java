@@ -12,6 +12,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class TodoAdapter extends BaseAdapter {
@@ -43,32 +44,38 @@ public class TodoAdapter extends BaseAdapter {
         return items;
     }
 
-    public void setItems(List<Todo> items) {
-        this.items = items;
-        notifyDataSetChanged();
-    }
-
     public void add(Todo todo) {
         items.add(todo);
         notifyDataSetChanged();
     }
 
-    public void remove(Todo todo) {
-        items.remove(todo);
+    public void remove(int position) {
+        items.remove(position);
+        notifyDataSetChanged();
+    }
+
+    public void removeAll(Collection<Todo> todos) {
+        items.removeAll(todos);
         notifyDataSetChanged();
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        final Todo todo = getItem(position);
+
         View layout = inflater.inflate(R.layout.item, parent, false);
+
         final TextView textView = (TextView) layout.findViewById(R.id.todoText);
+        textView.setText(todo.getText());
 
         CheckBox checkBox = (CheckBox) layout.findViewById(R.id.todoCompleted);
+        checkBox.setChecked(todo.isCompleted());
         checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                int flags = textView.getPaintFlags();
+                todo.setCompleted(isChecked);
 
+                int flags = textView.getPaintFlags();
                 if (isChecked) {
                     textView.setPaintFlags(flags | Paint.STRIKE_THRU_TEXT_FLAG);
                 } else {
@@ -76,10 +83,6 @@ public class TodoAdapter extends BaseAdapter {
                 }
             }
         });
-
-        Todo todo = getItem(position);
-        textView.setText(todo.getText());
-        checkBox.setChecked(todo.isCompleted());
 
         return layout;
     }
