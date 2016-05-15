@@ -14,7 +14,7 @@ class TodoAdapter(context: Context) : BaseAdapter() {
 
     private val inflater = LayoutInflater.from(context)
 
-    val items = ArrayList<Todo>()
+    val items : MutableList<Todo> = ArrayList()
 
     override fun getCount() = items.size
 

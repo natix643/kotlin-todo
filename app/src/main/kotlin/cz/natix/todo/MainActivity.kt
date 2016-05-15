@@ -14,23 +14,17 @@ import android.widget.TextView
 
 class MainActivity : AppCompatActivity(), TextInputDialog.Callback {
 
-    private lateinit var adapter: TodoAdapter
+    private val adapter by lazy { TodoAdapter(this) }
 
-    private lateinit var listView: ListView
-    private lateinit var emptyListText: TextView
-    private lateinit var floatingButton: FloatingActionButton
+    private val listView by lazy { findViewById(android.R.id.list) as ListView }
+    private val emptyListText by lazy { findViewById(android.R.id.empty) as TextView }
+    private val floatingButton by lazy { findViewById(R.id.floatingButton) as FloatingActionButton }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
 
-        listView = findViewById(android.R.id.list) as ListView
-        emptyListText = findViewById(android.R.id.empty) as TextView
-
-        floatingButton = findViewById(R.id.floatingButton) as FloatingActionButton
         floatingButton.setOnClickListener { TextInputDialog().show(fragmentManager, "") }
-
-        adapter = TodoAdapter(this)
 
         listView.adapter = adapter
         listView.emptyView = emptyListText
